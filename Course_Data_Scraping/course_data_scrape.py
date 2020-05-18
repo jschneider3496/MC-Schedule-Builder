@@ -1,6 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from path impot DRIVER_PATH, COURSE_DATA_PATH
+from path import DRIVER_PATH, COURSE_DATA_PATH
 from bs4 import BeautifulSoup
 import json
 import re
