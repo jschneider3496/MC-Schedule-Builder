@@ -1,1 +1,3 @@
 Course_Data_Scraping/path.py
+__pycache__/
+.vscode/

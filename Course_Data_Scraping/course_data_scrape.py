@@ -1,13 +1,13 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from path import DRIVER_PATH, COURSE_DATA_PATH
+import path_config
 from bs4 import BeautifulSoup
 import json
 import re
 import datetime
 import os
 
-driver_path = DRIVER_PATH
+driver_path = path_config.DRIVER_PATH
 
 options = Options()
 options.headless = True
@@ -123,14 +123,14 @@ for x in class_list_codes:
 
     # Remove old file if it exists
     try: 
-        os.remove(COURSE_DATA_PATH + x + '.txt')
+        os.remove(path_config.COURSE_DATA_PATH + "\\" + x + '.txt')
         print("File " + x +  ".txt has been removed")
     except FileNotFoundError:
         print("File " + x + ".txt not found")
 
     # Create new json file
-    with open(COURSE_DATA_PATH + x + '.txt', 'w') as outfile:
+    with open(path_config.COURSE_DATA_PATH + "\\" + x + '.txt', 'w') as outfile:
         json.dump(data, outfile)
-    print("File has been created")
+    print("File " + x + ".txt has been created")
 
 driver.quit()
