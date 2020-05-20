@@ -123,14 +123,14 @@ for x in class_list_codes:
 
     # Remove old file if it exists
     try: 
-        os.remove(path_config.COURSE_DATA_PATH + "\\" + x + '.txt')
-        print("File " + x +  ".txt has been removed")
+        os.remove(path_config.COURSE_DATA_PATH + "\\" + x + '.json')
+        print("File " + x +  ".json has been removed")
     except FileNotFoundError:
-        print("File " + x + ".txt not found")
+        print("File " + x + ".json not found")
 
     # Create new json file
-    with open(path_config.COURSE_DATA_PATH + "\\" + x + '.txt', 'w') as outfile:
+    with open(path_config.COURSE_DATA_PATH + "\\" + x + '.json', 'w') as outfile:
         json.dump(data, outfile)
-    print("File " + x + ".txt has been created")
+    print("File " + x + ".json has been created")
 
 driver.quit()
