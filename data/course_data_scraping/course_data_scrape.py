@@ -36,11 +36,11 @@ for x in class_list_codes:
     class_names = soup.find_all("table", class_="datadisplaytable", summary="This layout table is used to present the sections found")
     class_contents = soup.find_all("table", class_="datadisplaytable", summary="This table lists the scheduled meeting times and assigned instructors for this class..")
 
-    data = {}
-
+    data = []
+    titles = []
     for n in class_names:
         name = n.find('b').text
-        data[name] = []
+        titles.append(name)
 
     for c in class_contents:
         course_info = c.find_all("td", class_="dddefault")
@@ -100,15 +100,20 @@ for x in class_list_codes:
             'tba' : tba
         }
 
-        print("Retrieving: " + course + " " + crn + " " + credits + " " + days + " " + time + " " + seats + " " + waitlist + " " + campus + " " + location + " " + instructor + " " + schedule_type)
+        title = ""
+        for t in titles:
+            temp = course + "$"
+            if bool(re.search(temp, t)):
+                title = t
+                break
+
+        print("Retrieving: " + title + " " + course + " " + crn + " " + credits + " " + days + " " + time + " " + seats + " " + waitlist + " " + campus + " " + location + " " + instructor + " " + schedule_type)
 
         # Adding class info to data hash
-        for h in data:
-            temp = course + "$"
-            if bool(re.search(temp, h)):
-                data[h].append({
-                    'course' : course,
+        data.append({
                     'crn' : crn,
+                    'course' : course,
+                    'title' : title,
                     'credits' : credits,
                     'days' : class_days,
                     'times' : class_times,
@@ -118,8 +123,7 @@ for x in class_list_codes:
                     'location' : location,
                     'instructor' : instructor,
                     'schedule_type' : schedule_type
-                })
-                break
+        })
 
     # Remove old file if it exists
     try: 
