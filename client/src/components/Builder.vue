@@ -86,6 +86,7 @@ export default {
       schedule: [],
       name: '',
       id: '',
+      subjects: [],
     };
   },
   methods: {
@@ -97,6 +98,7 @@ export default {
           this.schedule = res.data.schedule;
           this.name = res.data.name;
           this.id = res.data.id;
+          this.subjects = res.data.subjects;
         })
         .catch((error) => {
           // eslint-disable-next-line
