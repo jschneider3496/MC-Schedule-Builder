@@ -137,4 +137,15 @@ for x in class_list_codes:
         json.dump(data, outfile)
     print("File " + x + ".json has been created")
 
+try: 
+    os.remove('./class_list_codes.json')
+    print("File class_list_codes.json has been removed")
+except FileNotFoundError:
+    print("File class_list_codes.json not found")
+
+# Create new json file
+with open('./class_list_codes.json', 'w') as outfile:
+    json.dump(class_list_codes, outfile)
+print("File class_list_codes.json has been created")
+
 driver.quit()
