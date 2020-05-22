@@ -8,9 +8,20 @@
         <br />
 
         <v-select :options="subjects" @input="getClassTitles" />
-        <v-select multiple v-if="class_titles.length" :options="class_titles" @input="getClassSections" label="title" />
+        <v-select
+          v-if="class_titles.length"
+          :options="class_titles"
+          @input="getClassSections"
+          label="title"
+        />
 
-        <div></div>
+        <div v-for="(sections, title) in selected_titles" :key="title">
+          <b-button v-b-toggle=title class="m-1">{{ title }}</b-button>
+          <b-collapse :id="title" v-for="(x, index) in sections" :key="index">
+            <b-card>{{ x.crn }}</b-card>
+          </b-collapse>
+        </div>
+
         <br />
         <br />
         <table class="table table-hover">
@@ -47,13 +58,17 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      // from schedule file
       schedule: [],
       name: '',
       id: '',
-      subjects: [],
+      selected_titles: {},
+
+      // Temporary
       class_titles: [],
       saved_classes: [],
       saved_sections: [],
+      subjects: [],
       subject: '',
     };
   },
@@ -67,6 +82,8 @@ export default {
           this.name = res.data.name;
           this.id = res.data.id;
           this.subjects = res.data.subjects;
+          this.selected_titles = res.data.selected_titles;
+          console.log(this.selected_titles);
         })
         .catch((error) => {
           // eslint-disable-next-line
@@ -76,7 +93,7 @@ export default {
     getClassTitles(subject) {
       const path = 'http://localhost:5000/builder';
       axios
-        .post(path, { subject, goal: 'titles' })
+        .post(path, { subject, goal: 'getTitles' })
         .then((res) => {
           this.getSchedule();
           this.subject = subject;
@@ -91,10 +108,9 @@ export default {
       const path = 'http://localhost:5000/builder';
       // alert(this.subject);
       axios
-        .post(path, { classTitle, goal: 'sections', subject: this.subject })
-        .then((res) => {
+        .post(path, { classTitle, goal: 'getSections', subject: this.subject })
+        .then(() => {
           this.getSchedule();
-          console.log(res.data.sections);
         })
         .catch((error) => {
           // eslint-disable-next-line
