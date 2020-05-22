@@ -18,6 +18,8 @@ SCHEDULE = []
 id = ""
 name = ""
 subjects = []
+class_titles = []
+class_offerings = []
 
 with open('../schedules/b82fe23e366a464aae0798c40b67ec53.json') as infile:
     temp = json.load(infile)
@@ -32,20 +34,30 @@ with open('../data/subjects.json') as infile:
 def ping_pong():
     return jsonify('pong!')
 
-@app.route('/builder', methods=['GET'])
+@app.route('/builder', methods=['GET', 'POST'])
 def builder_menu():
-    return jsonify({
-        'status': 'success',
-        'schedule': SCHEDULE,
-        'name': name,
-        'id': id,
-        'subjects': subjects
-    })
-
-
-
-
-    
+    if request.method == 'POST':
+        subject = request.get_json().get("subject")
+        with open('../data/course_data/' + subject + '.json') as infile:
+            class_offerings = json.load(infile)
+        class_titles = []
+        for c in class_offerings:
+            if c["title"] not in class_titles:
+                class_titles.append(c["title"])
+        return jsonify({
+            'class_titles': class_titles,
+            'subject': subject,
+            'class_offerings': class_offerings
+            })
+    else: 
+        return jsonify({
+            'status': 'success',
+            'schedule': SCHEDULE,
+            'name': name,
+            'id': id,
+            'subjects': subjects,
+        })
+        
 
 
 # @app.route('/builder/<builder_id>', methods = ['GET', 'POST'])
@@ -64,6 +76,5 @@ def builder_menu():
 #     else:
 #         response_object['books'] = BOOKS
 #     return jsonify(response_object)
-
 if __name__ == '__main__':
     app.run()

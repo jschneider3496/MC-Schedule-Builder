@@ -7,33 +7,8 @@
         <br />
         <br />
 
-        <mdb-dropdown multiLevel>
-          <mdb-dropdown-toggle slot="toggle" color="mdb-color">Click me</mdb-dropdown-toggle>
-          <mdb-dropdown-menu>
-            <mdb-dropdown-item tag="div" class="p-0" submenu>
-              <mdb-dropdown class="w-100">
-                <mdb-dropdown-item slot="toggle" submenuIcon="caret-right">Click me</mdb-dropdown-item>
-                <mdb-dropdown-menu class="ml-2 rounded-0 border-0 z-depth-1">
-                  <mdb-dropdown-item href="#">Item 1</mdb-dropdown-item>
-                  <mdb-dropdown-item href="#">Item 2</mdb-dropdown-item>
-                  <mdb-dropdown-item href="#">Item 3</mdb-dropdown-item>
-                </mdb-dropdown-menu>
-              </mdb-dropdown>
-            </mdb-dropdown-item>
-            <mdb-dropdown-item class="p-0" submenu>
-              <mdb-dropdown class="w-100">
-                <mdb-dropdown-item slot="toggle" submenuIcon="caret-right">Click me</mdb-dropdown-item>
-                <mdb-dropdown-menu class="ml-2 rounded-0 border-0 z-depth-1">
-                  <mdb-dropdown-item href="#">Item 1</mdb-dropdown-item>
-                  <mdb-dropdown-item href="#">Item 2</mdb-dropdown-item>
-                  <mdb-dropdown-item href="#">Item 3</mdb-dropdown-item>
-                </mdb-dropdown-menu>
-              </mdb-dropdown>
-            </mdb-dropdown-item>
-          </mdb-dropdown-menu>
-        </mdb-dropdown>
-
-
+        <v-select :options="subjects" @input="setSelected" />
+        <v-select v-if="class_titles.length" :options="class_titles" label="title" />
         <br />
         <br />
         <table class="table table-hover">
@@ -66,27 +41,15 @@
 
 <script>
 import axios from 'axios';
-import {
-  mdbDropdown,
-  mdbDropdownToggle,
-  mdbDropdownMenu,
-  mdbDropdownItem,
-} from 'mdbvue';
 
 export default {
-  name: 'DropdownPage',
-  components: {
-    mdbDropdown,
-    mdbDropdownToggle,
-    mdbDropdownMenu,
-    mdbDropdownItem,
-  },
   data() {
     return {
       schedule: [],
       name: '',
       id: '',
       subjects: [],
+      class_titles: [],
     };
   },
   methods: {
@@ -99,6 +62,19 @@ export default {
           this.name = res.data.name;
           this.id = res.data.id;
           this.subjects = res.data.subjects;
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+        });
+    },
+    setSelected(subject) {
+      const path = 'http://localhost:5000/builder';
+      axios
+        .post(path, { subject })
+        .then((res) => {
+          this.getSchedule();
+          this.class_titles = res.data.class_titles;
         })
         .catch((error) => {
           // eslint-disable-next-line
