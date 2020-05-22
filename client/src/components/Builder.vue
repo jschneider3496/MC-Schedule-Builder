@@ -7,8 +7,21 @@
         <br />
         <br />
 
-        <v-select :options="subjects" @input="setSelected" />
-        <v-select v-if="class_titles.length" :options="class_titles" label="title" />
+        <v-select :options="subjects" @input="getClassTitles" />
+        <v-select
+          v-if="class_titles.length"
+          :options="class_titles"
+          @input="getClassSections"
+          label="title"
+        />
+
+        <div v-for="(sections, title) in selected_titles" :key="title">
+          <b-button v-b-toggle=title class="m-1">{{ title }}</b-button>
+          <b-collapse :id="title" v-for="(x, index) in sections" :key="index">
+            <b-card>{{ x.crn }}</b-card>
+          </b-collapse>
+        </div>
+
         <br />
         <br />
         <table class="table table-hover">
@@ -27,7 +40,7 @@
               <td>{{ c.days }}</td>
               <td>
                 <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-warning btn-sm">Update</button>
+                  <button type="button" class="btn btn-success btn-sm">Update</button>
                   <button type="button" class="btn btn-danger btn-sm">Delete</button>
                 </div>
               </td>
@@ -45,11 +58,18 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      // from schedule file
       schedule: [],
       name: '',
       id: '',
-      subjects: [],
+      selected_titles: {},
+
+      // Temporary
       class_titles: [],
+      saved_classes: [],
+      saved_sections: [],
+      subjects: [],
+      subject: '',
     };
   },
   methods: {
@@ -62,19 +82,35 @@ export default {
           this.name = res.data.name;
           this.id = res.data.id;
           this.subjects = res.data.subjects;
+          this.selected_titles = res.data.selected_titles;
+          console.log(this.selected_titles);
         })
         .catch((error) => {
           // eslint-disable-next-line
           console.error(error);
         });
     },
-    setSelected(subject) {
+    getClassTitles(subject) {
       const path = 'http://localhost:5000/builder';
       axios
-        .post(path, { subject })
+        .post(path, { subject, goal: 'getTitles' })
         .then((res) => {
           this.getSchedule();
+          this.subject = subject;
           this.class_titles = res.data.class_titles;
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+        });
+    },
+    getClassSections(classTitle) {
+      const path = 'http://localhost:5000/builder';
+      // alert(this.subject);
+      axios
+        .post(path, { classTitle, goal: 'getSections', subject: this.subject })
+        .then(() => {
+          this.getSchedule();
         })
         .catch((error) => {
           // eslint-disable-next-line

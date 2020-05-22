@@ -14,18 +14,28 @@ app.config.from_object(__name__)
 # enable CORS
 CORS(app, resources={r'/*': {'origins': '*'}})
 
-SCHEDULE = []
+# From schedule file
+SCHEDULE_FILE = []
 id = ""
 name = ""
+schedule = []
+selected_titles = {}
+
+# Temporary
 subjects = []
 class_titles = []
 class_offerings = []
+sections = []
 
-with open('../schedules/b82fe23e366a464aae0798c40b67ec53.json') as infile:
-    temp = json.load(infile)
-    id = temp["id"]
-    name = temp["name"]
-    SCHEDULE = temp["schedule"]
+
+with open('../schedules/e298ede66f1e47e8bc5421fdf41dfbbd.json') as infile:
+    SCHEDULE_FILE = json.load(infile)
+    id = SCHEDULE_FILE["id"]
+    name = SCHEDULE_FILE["name"]
+    schedule = SCHEDULE_FILE["schedule"]
+    selected_titles = SCHEDULE_FILE["selected_titles"]
+
+
 with open('../data/subjects.json') as infile:
     subjects = json.load(infile)
 
@@ -36,45 +46,64 @@ def ping_pong():
 
 @app.route('/builder', methods=['GET', 'POST'])
 def builder_menu():
+
     if request.method == 'POST':
-        subject = request.get_json().get("subject")
-        with open('../data/course_data/' + subject + '.json') as infile:
-            class_offerings = json.load(infile)
-        class_titles = []
-        for c in class_offerings:
-            if c["title"] not in class_titles:
-                class_titles.append(c["title"])
-        return jsonify({
-            'class_titles': class_titles,
-            'subject': subject,
-            'class_offerings': class_offerings
-            })
+        # Post Dropdown #1: retrieve all unique titles related to subject
+        # No json updates, simply temporary updates
+        if request.get_json().get("goal") == "getTitles":
+            # Load all classes related to subject
+            subject = request.get_json().get("subject")
+            with open('../data/course_data/' + subject + '.json') as infile:
+                class_offerings = json.load(infile)
+
+            # Add unique class titles to class_titles
+            class_titles = []
+            for c in class_offerings:
+                if c["title"] not in class_titles:
+                    class_titles.append(c["title"])
+            return jsonify({
+                'class_titles': class_titles,
+                'subject': subject,
+                })
+
+        # Post Dropdown #2: Retrieve all sections/classes that match the title
+        # Update schedule file to include selected class title + sections
+        # Add
+        elif request.get_json().get("goal") == "getSections":
+            # Retrieve class title & subject
+            class_title = request.get_json().get("classTitle")
+            subject = request.get_json().get("subject")
+            with open('../data/course_data/' + subject + '.json') as infile:
+                class_offerings = json.load(infile)
+            
+            # Subset of all classes - contains all sections that match title 
+            # ie: for ELEM FRENCH I - FREN 101 -> course numbers 10372 & 16432
+            sections = []
+            for s in class_offerings:
+                if s["title"] == class_title:
+                    sections.append(s)
+            SCHEDULE_FILE["selected_titles"][class_title] = sections
+            print(SCHEDULE_FILE["selected_titles"])
+            print(id)
+            write_json(SCHEDULE_FILE, 'e298ede66f1e47e8bc5421fdf41dfbbd')
+            return jsonify({
+                'subject': subject,
+                'sections': sections
+                })
+
     else: 
         return jsonify({
-            'status': 'success',
-            'schedule': SCHEDULE,
+            'schedule': schedule,
             'name': name,
             'id': id,
             'subjects': subjects,
+            'selected_titles': selected_titles
         })
+
+def write_json(data, file_id):
+    with open('../schedules/' + file_id + '.json','w') as f: 
+        json.dump(data, f) 
         
 
-
-# @app.route('/builder/<builder_id>', methods = ['GET', 'POST'])
-# def builder_menu():
-#     response_object = {'status': 'success'}
-#     if request.method == 'POST':
-#         post_data = request.get_json()
-#         BOOKS.append({
-#             'id': uuid.uuid4().hex,
-#             'title': post_data.get('title'),
-#             'author': post_data.get('author'),
-#             'read': post_data.get('read')
-#         })
-#         write_json(BOOKS)
-#         response_object['message'] = 'Book added!'
-#     else:
-#         response_object['books'] = BOOKS
-#     return jsonify(response_object)
 if __name__ == '__main__':
     app.run()
