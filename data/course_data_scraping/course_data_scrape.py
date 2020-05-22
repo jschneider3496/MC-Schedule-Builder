@@ -22,7 +22,8 @@ soup = BeautifulSoup(html, "lxml")
 
 subjects = []
 for x in soup.find_all("span", class_="class-list-code"):
-    subjects.append(x.text)
+    if x.text not in subjects:
+        subjects.append(x.text)
 
 # subjects = ['ACCT', 'CMSC', 'NURS']
 for x in subjects:
@@ -127,13 +128,13 @@ for x in subjects:
 
     # Remove old file if it exists
     try: 
-        os.remove(path_config.COURSE_DATA_PATH + "\\" + x + '.json')
+        os.remove(path_config.COURSE_DATA_PATH + "/" + x + '.json')
         print("File " + x +  ".json has been removed")
     except FileNotFoundError:
         print("File " + x + ".json not found")
 
     # Create new json file
-    with open(path_config.COURSE_DATA_PATH + "\\" + x + '.json', 'w') as outfile:
+    with open(path_config.COURSE_DATA_PATH + "/" + x + '.json', 'w') as outfile:
         json.dump(data, outfile)
     print("File " + x + ".json has been created")
 
