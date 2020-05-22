@@ -1,4 +1,5 @@
-Course_Data_Scraping/path_config.py
-Course_Data_Scraping/__pycache__/
+course_data_scraping/path_config.py
+course_data_scraping/__pycache__/
 __pycache__/
 .vscode/
+course_data_scraping/env/

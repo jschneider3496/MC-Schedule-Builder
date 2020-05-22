@@ -17,11 +17,15 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 SCHEDULE = []
 id = ""
 name = ""
+subjects = []
+
 with open('../schedules/b82fe23e366a464aae0798c40b67ec53.json') as infile:
     temp = json.load(infile)
     id = temp["id"]
     name = temp["name"]
     SCHEDULE = temp["schedule"]
+with open('../data/subjects.json') as infile:
+    subjects = json.load(infile)
 
 # sanity check route
 @app.route('/ping', methods=['GET'])
@@ -34,8 +38,15 @@ def builder_menu():
         'status': 'success',
         'schedule': SCHEDULE,
         'name': name,
-        'id': id
+        'id': id,
+        'subjects': subjects
     })
+
+
+
+
+    
+
 
 # @app.route('/builder/<builder_id>', methods = ['GET', 'POST'])
 # def builder_menu():

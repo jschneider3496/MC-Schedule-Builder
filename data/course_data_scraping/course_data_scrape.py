@@ -20,12 +20,12 @@ driver.get('https://www.montgomerycollege.edu/admissions-registration/search-the
 html = driver.page_source
 soup = BeautifulSoup(html, "lxml")
 
-class_list_codes = []
+subjects = []
 for x in soup.find_all("span", class_="class-list-code"):
-    class_list_codes.append(x.text)
+    subjects.append(x.text)
 
-# class_list_codes = ['ACCT', 'CMSC', 'NURS']
-for x in class_list_codes:
+# subjects = ['ACCT', 'CMSC', 'NURS']
+for x in subjects:
 
     driver.get('https://appserv.montgomerycollege.edu/courselistblock_test/RedirectToSSB.aspx?term_in=202110&sel_subj=' + x + '&sel_camp=&sel_levl=&sel_attr=')
 
@@ -138,14 +138,14 @@ for x in class_list_codes:
     print("File " + x + ".json has been created")
 
 try: 
-    os.remove('./class_list_codes.json')
-    print("File class_list_codes.json has been removed")
+    os.remove('./subjects.json')
+    print("File subjects.json has been removed")
 except FileNotFoundError:
-    print("File class_list_codes.json not found")
+    print("File subjects.json not found")
 
 # Create new json file
-with open('./class_list_codes.json', 'w') as outfile:
-    json.dump(class_list_codes, outfile)
-print("File class_list_codes.json has been created")
+with open('./subjects.json', 'w') as outfile:
+    json.dump(subjects, outfile)
+print("File subjects.json has been created")
 
 driver.quit()
