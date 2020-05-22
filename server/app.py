@@ -20,6 +20,7 @@ name = ""
 subjects = []
 class_titles = []
 class_offerings = []
+sections = []
 
 with open('../schedules/b82fe23e366a464aae0798c40b67ec53.json') as infile:
     temp = json.load(infile)
@@ -37,18 +38,31 @@ def ping_pong():
 @app.route('/builder', methods=['GET', 'POST'])
 def builder_menu():
     if request.method == 'POST':
-        subject = request.get_json().get("subject")
-        with open('../data/course_data/' + subject + '.json') as infile:
-            class_offerings = json.load(infile)
-        class_titles = []
-        for c in class_offerings:
-            if c["title"] not in class_titles:
-                class_titles.append(c["title"])
-        return jsonify({
-            'class_titles': class_titles,
-            'subject': subject,
-            'class_offerings': class_offerings
-            })
+        if request.get_json().get("goal") == "titles":
+            subject = request.get_json().get("subject")
+            with open('../data/course_data/' + subject + '.json') as infile:
+                class_offerings = json.load(infile)
+            class_titles = []
+            for c in class_offerings:
+                if c["title"] not in class_titles:
+                    class_titles.append(c["title"])
+            return jsonify({
+                'class_titles': class_titles,
+                'subject': subject,
+                })
+        elif request.get_json().get("goal") == "sections":
+            class_title = request.get_json().get("classTitle")
+            subject = request.get_json().get("subject")
+            with open('../data/course_data/' + subject + '.json') as infile:
+                class_offerings = json.load(infile)
+            sections = []
+            for s in class_offerings:
+                if s["title"] in class_title:
+                    sections.append(s)
+            return jsonify({
+                'subject': subject,
+                'sections': sections
+                })
     else: 
         return jsonify({
             'status': 'success',
@@ -59,22 +73,5 @@ def builder_menu():
         })
         
 
-
-# @app.route('/builder/<builder_id>', methods = ['GET', 'POST'])
-# def builder_menu():
-#     response_object = {'status': 'success'}
-#     if request.method == 'POST':
-#         post_data = request.get_json()
-#         BOOKS.append({
-#             'id': uuid.uuid4().hex,
-#             'title': post_data.get('title'),
-#             'author': post_data.get('author'),
-#             'read': post_data.get('read')
-#         })
-#         write_json(BOOKS)
-#         response_object['message'] = 'Book added!'
-#     else:
-#         response_object['books'] = BOOKS
-#     return jsonify(response_object)
 if __name__ == '__main__':
     app.run()

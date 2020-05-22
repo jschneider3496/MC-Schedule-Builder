@@ -7,8 +7,10 @@
         <br />
         <br />
 
-        <v-select :options="subjects" @input="setSelected" />
-        <v-select v-if="class_titles.length" :options="class_titles" label="title" />
+        <v-select :options="subjects" @input="getClassTitles" />
+        <v-select multiple v-if="class_titles.length" :options="class_titles" @input="getClassSections" label="title" />
+
+        <div></div>
         <br />
         <br />
         <table class="table table-hover">
@@ -27,7 +29,7 @@
               <td>{{ c.days }}</td>
               <td>
                 <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-warning btn-sm">Update</button>
+                  <button type="button" class="btn btn-success btn-sm">Update</button>
                   <button type="button" class="btn btn-danger btn-sm">Delete</button>
                 </div>
               </td>
@@ -50,6 +52,9 @@ export default {
       id: '',
       subjects: [],
       class_titles: [],
+      saved_classes: [],
+      saved_sections: [],
+      subject: '',
     };
   },
   methods: {
@@ -68,13 +73,28 @@ export default {
           console.error(error);
         });
     },
-    setSelected(subject) {
+    getClassTitles(subject) {
       const path = 'http://localhost:5000/builder';
       axios
-        .post(path, { subject })
+        .post(path, { subject, goal: 'titles' })
         .then((res) => {
           this.getSchedule();
+          this.subject = subject;
           this.class_titles = res.data.class_titles;
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+        });
+    },
+    getClassSections(classTitle) {
+      const path = 'http://localhost:5000/builder';
+      // alert(this.subject);
+      axios
+        .post(path, { classTitle, goal: 'sections', subject: this.subject })
+        .then((res) => {
+          this.getSchedule();
+          console.log(res.data.sections);
         })
         .catch((error) => {
           // eslint-disable-next-line
