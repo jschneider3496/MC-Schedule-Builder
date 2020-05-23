@@ -16,10 +16,6 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 
 # From schedule file
 SCHEDULE_FILE = []
-id = ""
-name = ""
-schedule = []
-selected_titles = {}
 
 # Temporary
 subjects = []
@@ -30,11 +26,6 @@ sections = []
 
 with open('../schedules/e298ede66f1e47e8bc5421fdf41dfbbd.json') as infile:
     SCHEDULE_FILE = json.load(infile)
-    id = SCHEDULE_FILE["id"]
-    name = SCHEDULE_FILE["name"]
-    schedule = SCHEDULE_FILE["schedule"]
-    selected_titles = SCHEDULE_FILE["selected_titles"]
-
 
 with open('../data/subjects.json') as infile:
     subjects = json.load(infile)
@@ -83,8 +74,6 @@ def builder_menu():
                 if s["title"] == class_title:
                     sections.append(s)
             SCHEDULE_FILE["selected_titles"][class_title] = sections
-            print(SCHEDULE_FILE["selected_titles"])
-            print(id)
             write_json(SCHEDULE_FILE, 'e298ede66f1e47e8bc5421fdf41dfbbd')
             return jsonify({
                 'subject': subject,
@@ -93,13 +82,32 @@ def builder_menu():
 
     else: 
         return jsonify({
-            'schedule': schedule,
-            'name': name,
-            'id': id,
+            'schedule': SCHEDULE_FILE["schedule"],
+            'name': SCHEDULE_FILE["name"],
+            'id': SCHEDULE_FILE["id"],
             'subjects': subjects,
-            'selected_titles': selected_titles
+            'selected_titles': SCHEDULE_FILE["selected_titles"]
         })
 
+@app.route('/builder/<schedule_id>', methods=['PUT'])
+def single_section(schedule_id):
+    payload = request.get_json().get("payload")
+    goal = request.get_json().get("goal")
+    if goal == 'updateSchedule':
+        SCHEDULE_FILE["schedule"] = payload
+        write_json(SCHEDULE_FILE, schedule_id)
+    if goal == 'removeSelectedTitle':
+        remove_sections(payload)
+        SCHEDULE_FILE["selected_titles"].pop(payload)
+        write_json(SCHEDULE_FILE, schedule_id)
+    return jsonify({"status": "success"})
+
+def remove_sections(title):
+    for s in SCHEDULE_FILE["schedule"]:
+        if title == s['title']:
+            SCHEDULE_FILE["schedule"].remove(s)
+
+# Update schedule file with new data
 def write_json(data, file_id):
     with open('../schedules/' + file_id + '.json','w') as f: 
         json.dump(data, f) 

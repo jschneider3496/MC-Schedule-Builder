@@ -16,9 +16,29 @@
         />
 
         <div v-for="(sections, title) in selected_titles" :key="title">
-          <b-button v-b-toggle=title class="m-1">{{ title }}</b-button>
+          <b-button v-b-toggle="title" class="m-1">{{ title }}</b-button>
           <b-collapse :id="title" v-for="(x, index) in sections" :key="index">
-            <b-card>{{ x.crn }}</b-card>
+            <b-card>
+              <div>{{x.course}}: {{ x.crn }}</div>
+              <div>{{x.location}}: {{ x.campus }}</div>
+              <div>
+                <b-form-checkbox-group
+                  :id="x.crn"
+                  v-model="schedule"
+                  :options="[{text: x.crn, value: x}]"
+                  @change="onCheckbox"
+                ></b-form-checkbox-group>
+              </div>
+            </b-card>
+          </b-collapse>
+          <b-collapse :id="title">
+            <b-card>
+              <button
+                type="button"
+                class="btn btn-danger btn-sm"
+                @click="onDeleteSelectedTitle(title)"
+              >Delete</button>
+            </b-card>
           </b-collapse>
         </div>
 
@@ -38,12 +58,6 @@
               <td>{{ c.crn }}</td>
               <td>{{ c.title }}</td>
               <td>{{ c.days }}</td>
-              <td>
-                <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-success btn-sm">Update</button>
-                  <button type="button" class="btn btn-danger btn-sm">Delete</button>
-                </div>
-              </td>
             </tr>
           </tbody>
         </table>
@@ -83,7 +97,6 @@ export default {
           this.id = res.data.id;
           this.subjects = res.data.subjects;
           this.selected_titles = res.data.selected_titles;
-          console.log(this.selected_titles);
         })
         .catch((error) => {
           // eslint-disable-next-line
@@ -115,6 +128,38 @@ export default {
         .catch((error) => {
           // eslint-disable-next-line
           console.error(error);
+        });
+    },
+    onCheckbox(update) {
+      this.updateSchedule(update);
+    },
+    updateSchedule(payload) {
+      const path = `http://localhost:5000/builder/${this.id}`;
+      axios
+        .put(path, { payload, goal: 'updateSchedule' })
+        .then(() => {
+          this.getSchedule();
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+          this.getSchedule();
+        });
+    },
+    onDeleteSelectedTitle(selectedTitle) {
+      this.removeSelectedTitle(selectedTitle);
+    },
+    removeSelectedTitle(payload) {
+      const path = `http://localhost:5000/builder/${this.id}`;
+      axios
+        .put(path, { payload, goal: 'removeSelectedTitle' })
+        .then(() => {
+          this.getSchedule();
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+          this.getSchedule();
         });
     },
   },
