@@ -7,6 +7,7 @@ import re
 import datetime
 import os
 import shutil
+import random
 
 driver_path = path_config.DRIVER_PATH
 
@@ -52,6 +53,7 @@ for x in subjects:
 
     data = []
     titles = []
+    title_color = {}
     for n in class_names:
         name = n.find('b').text
         titles.append(name)
@@ -132,6 +134,9 @@ for x in subjects:
         else:
             campus_color = "#666699"
 
+        if (title not in title_color):
+            title_color[title] = "#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
+
         print("Retrieving: " + title + " " + course + " " + crn + " " + credits + " " + days + " " + time + " " + seats + " " + waitlist + " " + campus + " " + location + " " + instructor + " " + schedule_type)
 
         # Adding class info to data hash
@@ -148,7 +153,8 @@ for x in subjects:
                     'location' : location,
                     'instructor' : instructor,
                     'schedule_type' : schedule_type,
-                    'campus_color': campus_color
+                    'campus_color': campus_color,
+                    'class_color': title_color[title]
         })
 
     # Create new json file
