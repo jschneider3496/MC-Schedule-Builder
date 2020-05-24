@@ -6,6 +6,8 @@ import json
 import re
 import datetime
 import os
+import random
+import shutil
 
 driver_path = path_config.DRIVER_PATH
 
@@ -19,6 +21,19 @@ driver.get('https://www.montgomerycollege.edu/admissions-registration/search-the
 # Use html from selenium page to create BS4 soup
 html = driver.page_source
 soup = BeautifulSoup(html, "lxml")
+
+# Delete old course_data
+folder = path_config.COURSE_DATA_PATH
+for filename in os.listdir(folder):
+    file_path = os.path.join(folder, filename)
+    try:
+        if os.path.isfile(file_path) or os.path.islink(file_path):
+            os.unlink(file_path)
+        elif os.path.isdir(file_path):
+            shutil.rmtree(file_path)
+    except Exception as e:
+        print('Failed to delete %s. Reason: %s' % (file_path, e))
+
 
 subjects = []
 for x in soup.find_all("span", class_="class-list-code"):
@@ -108,6 +123,8 @@ for x in subjects:
                 title = t
                 break
 
+        color = "#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
+
         print("Retrieving: " + title + " " + course + " " + crn + " " + credits + " " + days + " " + time + " " + seats + " " + waitlist + " " + campus + " " + location + " " + instructor + " " + schedule_type)
 
         # Adding class info to data hash
@@ -123,21 +140,16 @@ for x in subjects:
                     'campus' : campus,
                     'location' : location,
                     'instructor' : instructor,
-                    'schedule_type' : schedule_type
+                    'schedule_type' : schedule_type,
+                    'color': color
         })
-
-    # Remove old file if it exists
-    try: 
-        os.remove(path_config.COURSE_DATA_PATH + "/" + x + '.json')
-        print("File " + x +  ".json has been removed")
-    except FileNotFoundError:
-        print("File " + x + ".json not found")
 
     # Create new json file
     with open(path_config.COURSE_DATA_PATH + "/" + x + '.json', 'w') as outfile:
         json.dump(data, outfile)
     print("File " + x + ".json has been created")
 
+# Update subjects
 try: 
     os.remove('./subjects.json')
     print("File subjects.json has been removed")
