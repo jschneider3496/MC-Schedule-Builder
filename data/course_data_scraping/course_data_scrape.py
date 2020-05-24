@@ -6,7 +6,6 @@ import json
 import re
 import datetime
 import os
-import random
 import shutil
 
 driver_path = path_config.DRIVER_PATH
@@ -34,7 +33,6 @@ for filename in os.listdir(folder):
     except Exception as e:
         print('Failed to delete %s. Reason: %s' % (file_path, e))
 
-
 subjects = []
 for x in soup.find_all("span", class_="class-list-code"):
     if x.text not in subjects:
@@ -43,7 +41,7 @@ for x in soup.find_all("span", class_="class-list-code"):
 # subjects = ['ACCT', 'CMSC', 'NURS']
 for x in subjects:
 
-    driver.get('https://appserv.montgomerycollege.edu/courselistblock_test/RedirectToSSB.aspx?term_in=202110&sel_subj=' + x + '&sel_camp=&sel_levl=&sel_attr=')
+    driver.get('https://appserv.montgomerycollege.edu/courselistblock_test/RedirectToSSB.aspx?term_in=202030&sel_subj=' + x + '&sel_camp=&sel_levl=&sel_attr=')
 
     # Use html from selenium page to create BS4 soup
     html = driver.page_source
@@ -123,7 +121,16 @@ for x in subjects:
                 title = t
                 break
 
-        color = "#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
+
+        campus_color = ""
+        if (campus == "Rockville"):
+            campus_color = "#ff0000"
+        elif (campus == "Takoma Park/Silver Spring"):
+            campus_color = "#0099cc"
+        elif (campus == "Germantown"):
+            campus_color = "#009900"
+        else:
+            campus_color = "#666699"
 
         print("Retrieving: " + title + " " + course + " " + crn + " " + credits + " " + days + " " + time + " " + seats + " " + waitlist + " " + campus + " " + location + " " + instructor + " " + schedule_type)
 
@@ -141,7 +148,7 @@ for x in subjects:
                     'location' : location,
                     'instructor' : instructor,
                     'schedule_type' : schedule_type,
-                    'color': color
+                    'campus_color': campus_color
         })
 
     # Create new json file
