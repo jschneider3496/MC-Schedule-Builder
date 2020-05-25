@@ -5,15 +5,17 @@ import 'bootstrap/dist/css/bootstrap.css';
 import BootstrapVue from 'bootstrap-vue';
 import Vue from 'vue';
 import vSelect from 'vue-select';
+import Vuetify from 'vuetify';
 import App from './App.vue';
 import router from './router';
 import 'vue-select/dist/vue-select.css';
+import 'vuetify/dist/vuetify.min.css';
 
 Vue.component('v-select', vSelect);
 
 
 Vue.use(BootstrapVue);
-
+Vue.use(Vuetify);
 Vue.config.productionTip = false;
 
 new Vue({
