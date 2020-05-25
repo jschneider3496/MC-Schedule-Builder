@@ -115,11 +115,12 @@
                               <v-icon v-if="!x.days.saturday" small>far fa-square</v-icon>
                             </v-col>
                             <v-col>
-                              <div>
+                              <div v-if="!x.times.tba">
                                 {{x.schedule_type}}:
                                 {{x.times.start.substring(11,16)}}
                                 - {{x.times.end.substring(11,16)}}
                               </div>
+                              <div v-if="x.times.tba">{{x.schedule_type}}: TBA</div>
                             </v-col>
                             <v-col cols="1">
                               <v-icon :color="x.campus_color" :id="x.crn + 'tooltip'">fas fa-school</v-icon>
@@ -190,11 +191,13 @@ export default {
           this.selected_titles = res.data.selected_titles;
           const tempClasses = [];
           this.schedule.forEach((element) => {
-            tempClasses.push({
-              name: element.course,
-              start: element.times.start,
-              end: element.times.end,
-              color: element.class_color,
+            element.times.meetings.forEach((e) => {
+              tempClasses.push({
+                name: element.course,
+                start: e.start,
+                end: e.end,
+                color: element.class_color,
+              });
             });
           });
           this.events = tempClasses;
