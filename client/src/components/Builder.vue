@@ -13,7 +13,6 @@
         <b-col cols="12" md="8">
           <div class="row">
             <div class="col-sm-10">
-
               <table class="table table-hover">
                 <thead>
                   <tr>
@@ -48,10 +47,15 @@
           />
 
           <!-- Select section -->
-          <div v-for="(sections, title) in selected_titles" :key="title">
-            <b-button v-b-toggle="title" class="m-1">{{ title }}</b-button>
-            <b-collapse :id="title" v-for="(x, index) in sections" :key="index">
-              <b-card>
+          <v-expansion-panels multiple>
+            <v-expansion-panel v-for="(sections, title) in selected_titles" :key="title">
+              <v-expansion-panel-header outline :color="sections[0].class_color">
+                {{title}}
+                <template v-slot:actions>
+                  <v-icon color="white">mdi-check</v-icon>
+                </template>
+              </v-expansion-panel-header>
+              <v-expansion-panel-content :id="title" v-for="(x, index) in sections" :key="index">
                 <div>{{x.course}}: {{ x.crn }}</div>
                 <div>{{x.location}}: {{ x.campus }}</div>
                 <div>
@@ -63,19 +67,17 @@
                     @change="onCheckbox"
                   ></b-form-checkbox-group>
                 </div>
-              </b-card>
-            </b-collapse>
-            <!-- Remove selected course title -->
-            <b-collapse :id="title">
-              <b-card>
+              </v-expansion-panel-content>
+              <!-- Remove selected course title -->
+              <v-expansion-panel-content :id="title">
                 <button
                   type="button"
                   class="btn btn-danger btn-sm"
                   @click="onDeleteSelectedTitle(title)"
                 >Delete</button>
-              </b-card>
-            </b-collapse>
-          </div>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
         </b-col>
       </b-row>
     </b-container>
@@ -138,13 +140,17 @@ export default {
         const path = 'http://localhost:5000/builder';
         // alert(this.subject);
         axios
-          .post(path, { classTitle, goal: 'getSections', subject: this.subject })
+          .post(path, {
+            classTitle,
+            goal: 'getSections',
+            subject: this.subject,
+          })
           .then(() => {
             this.getSchedule();
           })
           .catch((error) => {
-          // eslint-disable-next-line
-          console.error(error);
+            // eslint-disable-next-line
+            console.error(error);
           });
       }
     },
