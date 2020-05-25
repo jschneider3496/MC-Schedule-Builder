@@ -104,13 +104,54 @@ for x in subjects:
             end_time = times[1]
             start_time = datetime.datetime.strptime(start_time, '%I:%M%p')
             end_time = datetime.datetime.strptime(end_time, '%I:%M%p')
+        
+        # Class meeting times (calendar events)
+        meetings = []
+        if (not tba):
+            if(class_days["sunday"]):
+                meetings.append({
+                    'start': str(start_time - datetime.timedelta(days=1)),
+                    'end': str(end_time - datetime.timedelta(days=1))
+                })
+            if(class_days["monday"]):
+                meetings.append({
+                    'start': str(start_time),
+                    'end': str(end_time)
+                })
+            if(class_days["tuesday"]):
+                meetings.append({
+                    'start': str(start_time + datetime.timedelta(days=1)),
+                    'end': str(end_time + datetime.timedelta(days=1))
+                })
+            if(class_days["wednesday"]):
+                meetings.append({
+                    'start': str(start_time + datetime.timedelta(days=2)),
+                    'end': str(end_time + datetime.timedelta(days=2))
+                })
+            if(class_days["thursday"]):
+                meetings.append({
+                    'start': str(start_time + datetime.timedelta(days=3)),
+                    'end': str(end_time + datetime.timedelta(days=3))
+                })      
+            if(class_days["friday"]):
+                meetings.append({
+                    'start': str(start_time + datetime.timedelta(days=4)),
+                    'end': str(end_time + datetime.timedelta(days=4))
+                })
+            if(class_days["saturday"]):
+                meetings.append({
+                    'start': str(start_time + datetime.timedelta(days=5)),
+                    'end': str(end_time + datetime.timedelta(days=5))
+                })      
 
         class_times = {
             'start' : str(start_time),
             'end' : str(end_time),
-            'tba' : tba
+            'tba' : tba,
+            'meetings' : meetings
         }
 
+        # Class title 
         title = ""
         for t in titles:
             temp = course + "$"
