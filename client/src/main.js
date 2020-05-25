@@ -10,6 +10,7 @@ import App from './App.vue';
 import router from './router';
 import 'vue-select/dist/vue-select.css';
 import 'vuetify/dist/vuetify.min.css';
+import 'font-awesome/css/font-awesome.min.css';
 
 Vue.component('v-select', vSelect);
 
