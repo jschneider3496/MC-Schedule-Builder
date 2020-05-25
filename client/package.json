@@ -16,7 +16,8 @@
     "mdbvue": "6.7.1",
     "vue": "^2.6.10",
     "vue-router": "^3.0.3",
-    "vue-select": "^3.10.3"
+    "vue-select": "^3.10.3",
+    "vuetify": "^2.2.29"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.12.0",
