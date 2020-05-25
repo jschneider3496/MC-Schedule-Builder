@@ -56,20 +56,73 @@
                 </template>
               </v-expansion-panel-header>
               <v-expansion-panel-content :id="title" v-for="(x, index) in sections" :key="index">
-                <div>{{x.course}}: {{ x.crn }}</div>
-                <div>{{x.location}}: {{ x.campus }}</div>
-                <div>
-                  <!-- Select/Unselect course (will add and drop to schedule) -->
-                  <b-form-checkbox-group
-                    :id="x.crn"
-                    v-model="schedule"
-                    :options="[{text: x.crn, value: x}]"
-                    @change="onCheckbox"
-                  ></b-form-checkbox-group>
-                </div>
+                <v-card class="mx-auto" outlined>
+                  <v-list-item three-line>
+                    <v-list-item-content>
+                      <v-container>
+                        <v-row justify="space-around">
+                          <v-col>
+                            <div>{{x.instructor}} ({{x.crn}})</div>
+                          </v-col>
+                          <v-col cols="1">
+                            <!-- Select/Unselect course (will add and drop to schedule) -->
+                            <b-form-checkbox-group
+                              size="sm"
+                              style="align: right"
+                              :id="x.crn"
+                              v-model="schedule"
+                              :options="[{text: '', value: x}]"
+                              @change="onCheckbox"
+                            ></b-form-checkbox-group>
+                          </v-col>
+                        </v-row>
+                        <v-row justify="space-around">
+                          <v-col>
+                            <v-icon v-if="x.days.sunday" small :color="x.class_color">fas fa-square</v-icon>
+                            <v-icon v-if="!x.days.sunday" small>far fa-square</v-icon>
+                            <v-icon v-if="x.days.monday" small :color="x.class_color">fas fa-square</v-icon>
+                            <v-icon v-if="!x.days.monday" small>far fa-square</v-icon>
+                            <v-icon v-if="x.days.tuesday" small :color="x.class_color">fas fa-square</v-icon>
+                            <v-icon v-if="!x.days.tuesday" small>far fa-square</v-icon>
+                            <v-icon
+                              v-if="x.days.wednesday"
+                              small
+                              :color="x.class_color"
+                            >fas fa-square</v-icon>
+                            <v-icon v-if="!x.days.wednesday" small>far fa-square</v-icon>
+                            <v-icon
+                              v-if="x.days.thursday"
+                              small
+                              :color="x.class_color"
+                            >fas fa-square</v-icon>
+                            <v-icon v-if="!x.days.thursday" small>far fa-square</v-icon>
+                            <v-icon v-if="x.days.friday" small :color="x.class_color">fas fa-square</v-icon>
+                            <v-icon v-if="!x.days.friday" small>far fa-square</v-icon>
+                            <v-icon
+                              v-if="x.days.saturday"
+                              small
+                              :color="x.class_color"
+                            >fas fa-square</v-icon>
+                            <v-icon v-if="!x.days.saturday" small>far fa-square</v-icon>
+                          </v-col>
+                          <v-col>
+                            <div>{{x.schedule_type}}: {{x.times.start.substring(11,16)}} - {{x.times.end.substring(11,16)}}</div>
+                          </v-col>
+                          <v-col cols="1">
+                            <v-icon :color="x.campus_color" :id="x.crn + 'tooltip'">fas fa-school</v-icon>
+                            <b-tooltip placement="bottom" :target="x.crn + 'tooltip'" triggers="hover">
+                              <span>{{x.campus}}: {{x.location}}</span>
+                            </b-tooltip>
+
+                          </v-col>
+                        </v-row>
+                      </v-container>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-card>
               </v-expansion-panel-content>
               <!-- Remove selected course title -->
-              <v-expansion-panel-content :id="title">
+              <v-expansion-panel-content class="text-center" :id="title">
                 <button
                   type="button"
                   class="btn btn-danger btn-sm"
@@ -93,7 +146,7 @@ export default {
       // from schedule file
       schedule: [],
       name: '',
-      id: '',
+      schedule_id: '',
       selected_titles: {},
 
       // Temporary
@@ -112,7 +165,7 @@ export default {
         .then((res) => {
           this.schedule = res.data.schedule;
           this.name = res.data.name;
-          this.id = res.data.id;
+          this.schedule_id = res.data.id;
           this.subjects = res.data.subjects;
           this.selected_titles = res.data.selected_titles;
         })
@@ -158,7 +211,7 @@ export default {
       this.updateSchedule(update);
     },
     updateSchedule(payload) {
-      const path = `http://localhost:5000/builder/${this.id}`;
+      const path = `http://localhost:5000/builder/${this.schedule_id}`;
       axios
         .put(path, { payload, goal: 'updateSchedule' })
         .then(() => {
@@ -174,7 +227,7 @@ export default {
       this.removeSelectedTitle(selectedTitle);
     },
     removeSelectedTitle(payload) {
-      const path = `http://localhost:5000/builder/${this.id}`;
+      const path = `http://localhost:5000/builder/${this.schedule_id}`;
       axios
         .put(path, { payload, goal: 'removeSelectedTitle' })
         .then(() => {
