@@ -7,133 +7,150 @@
       </b-navbar>
     </div>
 
-    <b-container class="split-screen">
-      <b-row>
-        <!-- LHS of screen -->
-        <b-col cols="12" md="8">
-          <div class="row">
-            <div class="col-sm-10">
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th scope="col">CRN</th>
-                    <th scope="col">Course</th>
-                    <th scope="col">Days</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(c, index) in schedule" :key="index">
-                    <td>{{ c.crn }}</td>
-                    <td>{{ c.title }}</td>
-                    <td>{{ c.days }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </b-col>
+    <v-container class="split-screen">
+      <v-app id="inspire">
+        <v-row>
+          <!-- LHS of screen -->
+          <v-col>
+            <v-sheet>
+              <v-calendar
+                interval-height="36"
+                first-interval="6"
+                interval-count="16"
+                ref="calendar"
+                :value="today"
+                :events="events"
+                color="primary"
+                type="week"
+                :event-color="getEventColor"
+              ></v-calendar>
+            </v-sheet>
+          </v-col>
 
-        <!-- RHS of screen -->
-        <b-col cols="6" md="4">
-          <!-- Select Subject -->
-          <v-select :options="subjects" @input="getClassTitles" />
-          <!-- Select course title -->
-          <v-select
-            v-if="class_titles.length"
-            :options="class_titles"
-            @input="getClassSections"
-            label="title"
-          />
+          <!-- RHS of screen -->
+          <v-col cols="6" md="4">
+            <!-- Select Subject -->
+            <v-select :options="subjects" @input="getClassTitles" />
+            <!-- Select course title -->
+            <v-select
+              v-if="class_titles.length"
+              :options="class_titles"
+              @input="getClassSections"
+              label="title"
+            />
 
-          <!-- Select section -->
-          <v-expansion-panels multiple>
-            <v-expansion-panel v-for="(sections, title) in selected_titles" :key="title">
-              <v-expansion-panel-header outline :color="sections[0].class_color">
-                {{title}}
-                <template v-slot:actions>
-                  <v-icon color="white">mdi-check</v-icon>
-                </template>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content :id="title" v-for="(x, index) in sections" :key="index">
-                <v-card class="mx-auto" outlined>
-                  <v-list-item three-line>
-                    <v-list-item-content>
-                      <v-container>
-                        <v-row justify="space-around">
-                          <v-col>
-                            <div>{{x.instructor}} ({{x.crn}})</div>
-                          </v-col>
-                          <v-col cols="1">
-                            <!-- Select/Unselect course (will add and drop to schedule) -->
-                            <b-form-checkbox-group
-                              size="sm"
-                              style="align: right"
-                              :id="x.crn"
-                              v-model="schedule"
-                              :options="[{text: '', value: x}]"
-                              @change="onCheckbox"
-                            ></b-form-checkbox-group>
-                          </v-col>
-                        </v-row>
-                        <v-row justify="space-around">
-                          <v-col>
-                            <v-icon v-if="x.days.sunday" small :color="x.class_color">fas fa-square</v-icon>
-                            <v-icon v-if="!x.days.sunday" small>far fa-square</v-icon>
-                            <v-icon v-if="x.days.monday" small :color="x.class_color">fas fa-square</v-icon>
-                            <v-icon v-if="!x.days.monday" small>far fa-square</v-icon>
-                            <v-icon v-if="x.days.tuesday" small :color="x.class_color">fas fa-square</v-icon>
-                            <v-icon v-if="!x.days.tuesday" small>far fa-square</v-icon>
-                            <v-icon
-                              v-if="x.days.wednesday"
-                              small
-                              :color="x.class_color"
-                            >fas fa-square</v-icon>
-                            <v-icon v-if="!x.days.wednesday" small>far fa-square</v-icon>
-                            <v-icon
-                              v-if="x.days.thursday"
-                              small
-                              :color="x.class_color"
-                            >fas fa-square</v-icon>
-                            <v-icon v-if="!x.days.thursday" small>far fa-square</v-icon>
-                            <v-icon v-if="x.days.friday" small :color="x.class_color">fas fa-square</v-icon>
-                            <v-icon v-if="!x.days.friday" small>far fa-square</v-icon>
-                            <v-icon
-                              v-if="x.days.saturday"
-                              small
-                              :color="x.class_color"
-                            >fas fa-square</v-icon>
-                            <v-icon v-if="!x.days.saturday" small>far fa-square</v-icon>
-                          </v-col>
-                          <v-col>
-                            <div>{{x.schedule_type}}: {{x.times.start.substring(11,16)}} - {{x.times.end.substring(11,16)}}</div>
-                          </v-col>
-                          <v-col cols="1">
-                            <v-icon :color="x.campus_color" :id="x.crn + 'tooltip'">fas fa-school</v-icon>
-                            <b-tooltip placement="bottom" :target="x.crn + 'tooltip'" triggers="hover">
-                              <span>{{x.campus}}: {{x.location}}</span>
-                            </b-tooltip>
-
-                          </v-col>
-                        </v-row>
-                      </v-container>
-                    </v-list-item-content>
-                  </v-list-item>
-                </v-card>
-              </v-expansion-panel-content>
-              <!-- Remove selected course title -->
-              <v-expansion-panel-content class="text-center" :id="title">
-                <button
-                  type="button"
-                  class="btn btn-danger btn-sm"
-                  @click="onDeleteSelectedTitle(title)"
-                >Delete</button>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-expansion-panels>
-        </b-col>
-      </b-row>
-    </b-container>
+            <!-- Select section -->
+            <v-expansion-panels multiple>
+              <v-expansion-panel v-for="(sections, title) in selected_titles" :key="title">
+                <v-expansion-panel-header outline :color="sections[0].class_color">
+                  {{title}}
+                  <template v-slot:actions>
+                    <v-icon color="white">mdi-check</v-icon>
+                  </template>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content :id="title" v-for="(x, index) in sections" :key="index">
+                  <v-card class="mx-auto" outlined>
+                    <v-list-item three-line>
+                      <v-list-item-content>
+                        <v-container>
+                          <v-row justify="space-around">
+                            <v-col>
+                              <div>{{x.instructor}} ({{x.crn}})</div>
+                            </v-col>
+                            <v-col cols="1">
+                              <!-- Select/Unselect course (will add and drop to schedule) -->
+                              <b-form-checkbox-group
+                                size="sm"
+                                style="align: right"
+                                :id="x.crn"
+                                v-model="schedule"
+                                :options="[{text: '', value: x}]"
+                                @change="onCheckbox"
+                              ></b-form-checkbox-group>
+                            </v-col>
+                          </v-row>
+                          <v-row justify="space-around">
+                            <v-col>
+                              <v-icon
+                                v-if="x.days.sunday"
+                                small
+                                :color="x.class_color"
+                              >fas fa-square</v-icon>
+                              <v-icon v-if="!x.days.sunday" small>far fa-square</v-icon>
+                              <v-icon
+                                v-if="x.days.monday"
+                                small
+                                :color="x.class_color"
+                              >fas fa-square</v-icon>
+                              <v-icon v-if="!x.days.monday" small>far fa-square</v-icon>
+                              <v-icon
+                                v-if="x.days.tuesday"
+                                small
+                                :color="x.class_color"
+                              >fas fa-square</v-icon>
+                              <v-icon v-if="!x.days.tuesday" small>far fa-square</v-icon>
+                              <v-icon
+                                v-if="x.days.wednesday"
+                                small
+                                :color="x.class_color"
+                              >fas fa-square</v-icon>
+                              <v-icon v-if="!x.days.wednesday" small>far fa-square</v-icon>
+                              <v-icon
+                                v-if="x.days.thursday"
+                                small
+                                :color="x.class_color"
+                              >fas fa-square</v-icon>
+                              <v-icon v-if="!x.days.thursday" small>far fa-square</v-icon>
+                              <v-icon
+                                v-if="x.days.friday"
+                                small
+                                :color="x.class_color"
+                              >fas fa-square</v-icon>
+                              <v-icon v-if="!x.days.friday" small>far fa-square</v-icon>
+                              <v-icon
+                                v-if="x.days.saturday"
+                                small
+                                :color="x.class_color"
+                              >fas fa-square</v-icon>
+                              <v-icon v-if="!x.days.saturday" small>far fa-square</v-icon>
+                            </v-col>
+                            <v-col>
+                              <div>
+                                {{x.schedule_type}}:
+                                {{x.times.start.substring(11,16)}}
+                                - {{x.times.end.substring(11,16)}}
+                              </div>
+                            </v-col>
+                            <v-col cols="1">
+                              <v-icon :color="x.campus_color" :id="x.crn + 'tooltip'">fas fa-school</v-icon>
+                              <b-tooltip
+                                placement="bottom"
+                                :target="x.crn + 'tooltip'"
+                                triggers="hover"
+                              >
+                                <span>{{x.campus}}: {{x.location}}</span>
+                              </b-tooltip>
+                            </v-col>
+                          </v-row>
+                        </v-container>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </v-card>
+                </v-expansion-panel-content>
+                <!-- Remove selected course title -->
+                <v-expansion-panel-content class="text-center" :id="title">
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-sm"
+                    @click="onDeleteSelectedTitle(title)"
+                  >Delete</button>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-expansion-panels>
+          </v-col>
+        </v-row>
+      </v-app>
+    </v-container>
   </div>
 </template>
 
@@ -155,6 +172,9 @@ export default {
       saved_sections: [],
       subjects: [],
       subject: '',
+
+      today: '1899-12-31',
+      events: [],
     };
   },
   methods: {
@@ -168,6 +188,16 @@ export default {
           this.schedule_id = res.data.id;
           this.subjects = res.data.subjects;
           this.selected_titles = res.data.selected_titles;
+          const tempClasses = [];
+          this.schedule.forEach((element) => {
+            tempClasses.push({
+              name: element.course,
+              start: element.times.start,
+              end: element.times.end,
+              color: element.class_color,
+            });
+          });
+          this.events = tempClasses;
         })
         .catch((error) => {
           // eslint-disable-next-line
@@ -239,9 +269,44 @@ export default {
           this.getSchedule();
         });
     },
+    getEventColor(event) {
+      return event.color;
+    },
+  },
+  mounted() {
+    this.$refs.calendar.scrollToTime('8:00');
   },
   created() {
     this.getSchedule();
   },
 };
 </script>
+
+<style>
+.my-event {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-radius: 2px;
+  background-color: #1867c0;
+  color: #ffffff;
+  border: 1px solid #1867c0;
+  font-size: 12px;
+  padding: 3px;
+  cursor: pointer;
+  margin-bottom: 1px;
+  left: 4px;
+  margin-right: 8px;
+  position: relative;
+}
+
+.my-event.with-time {
+  position: absolute;
+  right: 4px;
+  margin-right: 0px;
+}
+
+.v-calendar-daily_head-day-label {
+  display: none;
+}
+</style>
