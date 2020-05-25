@@ -2,12 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import path_config
 from bs4 import BeautifulSoup
-import json
-import re
-import datetime
-import os
-import shutil
-import random
+import random, colorsys, json, os, datetime, re
 
 driver_path = path_config.DRIVER_PATH
 
@@ -123,7 +118,6 @@ for x in subjects:
                 title = t
                 break
 
-
         campus_color = ""
         if (campus == "Rockville"):
             campus_color = "#ff0000"
@@ -135,7 +129,10 @@ for x in subjects:
             campus_color = "#666699"
 
         if (title not in title_color):
-            title_color[title] = "#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
+            h,s,l = random.random(), 0.5 + random.random()/2.0, 0.4 + random.random()/5.0
+            r,g,b = [int(256*i) for i in colorsys.hls_to_rgb(h,l,s)]
+            h = '#%02x%02x%02x' % (r, g, b)
+            title_color[title] = h
 
         print("Retrieving: " + title + " " + course + " " + crn + " " + credits + " " + days + " " + time + " " + seats + " " + waitlist + " " + campus + " " + location + " " + instructor + " " + schedule_type)
 
