@@ -1,16 +1,13 @@
 <template>
-  <div class="container">
+  <div>
     <!-- Header -->
-    <div>
-      <b-navbar toggleable="lg" type="dark" variant="info">
-        <b-navbar-brand href="#">MC Scheduler: {{name}}</b-navbar-brand>
-      </b-navbar>
-    </div>
-
-    <v-container class="split-screen">
+    <b-navbar toggleable="lg" type="dark" variant="info" fixed="top">
+      <b-navbar-brand href="#">MC Scheduler: {{name}}</b-navbar-brand>
+    </b-navbar>
+    <v-container>
       <v-app id="inspire">
         <v-row>
-          <!-- LHS of screen -->
+          <!-- LHS of screen (calendar) -->
           <v-col>
             <v-sheet>
               <v-calendar
@@ -23,131 +20,146 @@
                 color="primary"
                 type="week"
                 :event-color="getEventColor"
+                style="height: 100%"
               ></v-calendar>
             </v-sheet>
           </v-col>
 
           <!-- RHS of screen -->
-          <v-col cols="6" md="4">
-            <!-- Select Subject -->
-            <v-select :options="subjects" @input="getClassTitles" />
-            <!-- Select course title -->
-            <v-select
-              v-if="class_titles.length"
-              :options="class_titles"
-              @input="getClassSections"
-              label="title"
-            />
+          <v-col cols="4" style="max-height: 50%" class="overflow-y-auto">
+              <!-- Select Subject -->
+              <v-select :options="subjects" @input="getClassTitles" />
+              <!-- Select course title -->
+              <v-select
+                v-if="class_titles.length"
+                :options="class_titles"
+                @input="getClassSections"
+                label="title"
+              />
 
-            <!-- Select section -->
-            <v-expansion-panels multiple>
-              <v-expansion-panel v-for="(sections, title) in selected_titles" :key="title">
-                <v-expansion-panel-header outline :color="sections[0].class_color">
-                  {{title}}
-                  <template v-slot:actions>
-                    <v-icon color="white">mdi-check</v-icon>
-                  </template>
-                </v-expansion-panel-header>
-                <v-expansion-panel-content :id="title" v-for="(x, index) in sections" :key="index">
-                  <v-card class="mx-auto" outlined>
-                    <v-list-item three-line>
-                      <v-list-item-content>
-                        <v-container>
-                          <v-row justify="space-around">
-                            <v-col>
-                              <div>{{x.instructor}} ({{x.crn}})</div>
-                            </v-col>
-                            <v-col cols="1">
-                              <!-- Select/Unselect course (will add and drop to schedule) -->
-                              <b-form-checkbox-group
-                                size="sm"
-                                style="align: right"
-                                :id="x.crn"
-                                v-model="schedule"
-                                :options="[{text: '', value: x}]"
-                                @change="onCheckbox"
-                              ></b-form-checkbox-group>
-                            </v-col>
-                          </v-row>
-                          <v-row justify="space-around">
-                            <v-col>
-                              <v-icon
-                                v-if="x.days.sunday"
-                                small
-                                :color="x.class_color"
-                              >fas fa-square</v-icon>
-                              <v-icon v-if="!x.days.sunday" small>far fa-square</v-icon>
-                              <v-icon
-                                v-if="x.days.monday"
-                                small
-                                :color="x.class_color"
-                              >fas fa-square</v-icon>
-                              <v-icon v-if="!x.days.monday" small>far fa-square</v-icon>
-                              <v-icon
-                                v-if="x.days.tuesday"
-                                small
-                                :color="x.class_color"
-                              >fas fa-square</v-icon>
-                              <v-icon v-if="!x.days.tuesday" small>far fa-square</v-icon>
-                              <v-icon
-                                v-if="x.days.wednesday"
-                                small
-                                :color="x.class_color"
-                              >fas fa-square</v-icon>
-                              <v-icon v-if="!x.days.wednesday" small>far fa-square</v-icon>
-                              <v-icon
-                                v-if="x.days.thursday"
-                                small
-                                :color="x.class_color"
-                              >fas fa-square</v-icon>
-                              <v-icon v-if="!x.days.thursday" small>far fa-square</v-icon>
-                              <v-icon
-                                v-if="x.days.friday"
-                                small
-                                :color="x.class_color"
-                              >fas fa-square</v-icon>
-                              <v-icon v-if="!x.days.friday" small>far fa-square</v-icon>
-                              <v-icon
-                                v-if="x.days.saturday"
-                                small
-                                :color="x.class_color"
-                              >fas fa-square</v-icon>
-                              <v-icon v-if="!x.days.saturday" small>far fa-square</v-icon>
-                            </v-col>
-                            <v-col>
-                              <div v-if="!x.times.tba">
-                                {{x.schedule_type}}:
-                                {{x.times.start.substring(11,16)}}
-                                - {{x.times.end.substring(11,16)}}
-                              </div>
-                              <div v-if="x.times.tba">{{x.schedule_type}}: TBA</div>
-                            </v-col>
-                            <v-col cols="1">
-                              <v-icon :color="x.campus_color" :id="x.crn + 'tooltip'">fas fa-school</v-icon>
-                              <b-tooltip
-                                placement="bottom"
-                                :target="x.crn + 'tooltip'"
-                                triggers="hover"
-                              >
-                                <span>{{x.campus}}: {{x.location}}</span>
-                              </b-tooltip>
-                            </v-col>
-                          </v-row>
-                        </v-container>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </v-card>
-                </v-expansion-panel-content>
-                <!-- Remove selected course title -->
-                <v-expansion-panel-content class="text-center" :id="title">
-                  <button
-                    type="button"
-                    class="btn btn-danger btn-sm"
-                    @click="onDeleteSelectedTitle(title)"
-                  >Delete</button>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-            </v-expansion-panels>
+              <!-- Select section -->
+              <v-expansion-panels multiple>
+                <v-expansion-panel v-for="(sections, title) in selected_titles" :key="title">
+                  <!-- Collapse button (title) -->
+                  <v-expansion-panel-header outline :color="sections[0].class_color">
+                    {{title}}
+                    <template v-slot:actions>
+                      <v-icon color="white">mdi-check</v-icon>
+                    </template>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content
+                    :id="title"
+                    v-for="(x, index) in sections"
+                    :key="index"
+                  >
+                    <!-- Card containing class information -->
+                    <v-card
+                      class="mx-auto"
+                      outlined
+                      v-on:mouseover="mouseOver(x)"
+                      v-on:mouseleave="mouseLeave"
+                    >
+                      <v-list-item three-line>
+                        <v-list-item-content>
+                          <v-container>
+                            <v-row justify="space-around">
+                              <v-col>
+                                <div>{{x.instructor}} ({{x.crn}})</div>
+                              </v-col>
+                              <v-col cols="1">
+                                <!-- Select/Unselect course (will add and drop to schedule) -->
+                                <b-form-checkbox-group
+                                  size="sm"
+                                  style="align: right"
+                                  :id="x.crn"
+                                  v-model="schedule"
+                                  :options="[{text: '', value: x}]"
+                                  @change="onCheckbox"
+                                ></b-form-checkbox-group>
+                              </v-col>
+                            </v-row>
+                            <v-row justify="space-around">
+                              <v-col>
+                                <v-icon
+                                  v-if="x.days.sunday"
+                                  small
+                                  :color="x.class_color"
+                                >fas fa-square</v-icon>
+                                <v-icon v-if="!x.days.sunday" small>far fa-square</v-icon>
+                                <v-icon
+                                  v-if="x.days.monday"
+                                  small
+                                  :color="x.class_color"
+                                >fas fa-square</v-icon>
+                                <v-icon v-if="!x.days.monday" small>far fa-square</v-icon>
+                                <v-icon
+                                  v-if="x.days.tuesday"
+                                  small
+                                  :color="x.class_color"
+                                >fas fa-square</v-icon>
+                                <v-icon v-if="!x.days.tuesday" small>far fa-square</v-icon>
+                                <v-icon
+                                  v-if="x.days.wednesday"
+                                  small
+                                  :color="x.class_color"
+                                >fas fa-square</v-icon>
+                                <v-icon v-if="!x.days.wednesday" small>far fa-square</v-icon>
+                                <v-icon
+                                  v-if="x.days.thursday"
+                                  small
+                                  :color="x.class_color"
+                                >fas fa-square</v-icon>
+                                <v-icon v-if="!x.days.thursday" small>far fa-square</v-icon>
+                                <v-icon
+                                  v-if="x.days.friday"
+                                  small
+                                  :color="x.class_color"
+                                >fas fa-square</v-icon>
+                                <v-icon v-if="!x.days.friday" small>far fa-square</v-icon>
+                                <v-icon
+                                  v-if="x.days.saturday"
+                                  small
+                                  :color="x.class_color"
+                                >fas fa-square</v-icon>
+                                <v-icon v-if="!x.days.saturday" small>far fa-square</v-icon>
+                              </v-col>
+                              <v-col>
+                                <div v-if="!x.times.tba">
+                                  {{x.schedule_type}}:
+                                  {{x.times.start.substring(11,16)}}
+                                  - {{x.times.end.substring(11,16)}}
+                                </div>
+                                <div v-if="x.times.tba">{{x.schedule_type}}: TBA</div>
+                              </v-col>
+                              <v-col cols="1">
+                                <v-icon
+                                  :color="x.campus_color"
+                                  :id="x.crn + 'tooltip'"
+                                >fas fa-school</v-icon>
+                                <b-tooltip
+                                  placement="bottom"
+                                  :target="x.crn + 'tooltip'"
+                                  triggers="hover"
+                                >
+                                  <span>{{x.campus}}: {{x.location}}</span>
+                                </b-tooltip>
+                              </v-col>
+                            </v-row>
+                          </v-container>
+                        </v-list-item-content>
+                      </v-list-item>
+                    </v-card>
+                  </v-expansion-panel-content>
+                  <!-- Remove selected course title -->
+                  <v-expansion-panel-content class="text-center" :id="title">
+                    <button
+                      type="button"
+                      class="btn btn-danger btn-sm"
+                      @click="onDeleteSelectedTitle(title)"
+                    >Delete</button>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </v-expansion-panels>
           </v-col>
         </v-row>
       </v-app>
@@ -176,6 +188,8 @@ export default {
 
       today: '1899-12-31',
       events: [],
+      hover_bool: false,
+      hover_count: 0,
     };
   },
   methods: {
@@ -274,6 +288,32 @@ export default {
     },
     getEventColor(event) {
       return event.color;
+    },
+    mouseOver(course) {
+      let alreadyAdded = false;
+      this.schedule.forEach((c) => {
+        if (c.crn === course.crn) alreadyAdded = true;
+      });
+      if (!this.hover_bool && !alreadyAdded) {
+        course.times.meetings.forEach((e) => {
+          this.events.push({
+            name: course.course,
+            start: e.start,
+            end: e.end,
+            color: '#A0A0A0',
+          });
+          this.hover_count += 1;
+        });
+        this.hover_bool = true;
+      }
+    },
+    mouseLeave() {
+      let i;
+      for (i = 0; i < this.hover_count; i += 1) {
+        this.events.pop();
+      }
+      this.hover_bool = false;
+      this.hover_count = 0;
     },
   },
   mounted() {
