@@ -55,15 +55,31 @@
                     v-on:mouseover="mouseOver(x)"
                     v-on:mouseleave="mouseLeave(x)"
                   >
-                    <v-list style="padding-top: 0px; padding-bottom: 5px">
+                    <v-list style="padding-top: 0px; padding-bottom: 5px; overflow-x: auto">
                       <v-list-item dense>
-                        <v-list-item-content>
+                        <v-list-item-content style="overflow-x: auto">
                           <div>
-                            <v-container fluid style="height: 50px; padding-top: 0px">
-                              <v-row justify="space-around" style="height: 30px">
-                                <v-col>
-                                  <div>{{x.instructor}} ({{x.crn}})</div>
+                            <v-container fluid style="height: 50px; width: 400px; padding-top: 0px">
+                              <v-row justify="space-around" style="height: 22px">
+                                <v-col cols="1">
+                                  <v-icon
+                                    :color="x.campus_color"
+                                    :id="x.crn + 'tooltip'"
+                                  >fas fa-school</v-icon>
+                                  <b-tooltip
+                                    placement="bottom"
+                                    :target="x.crn + 'tooltip'"
+                                    triggers="hover"
+                                  >
+                                    <span>{{x.campus}}: {{x.location}}</span>
+                                  </b-tooltip>
                                 </v-col>
+                                <v-col>
+                                  <div style="text-align: left">{{x.instructor}} ({{x.crn}})</div>
+                                </v-col>
+                              </v-row>
+                              <!-- Color coded boxes -->
+                              <v-row justify="space-around">
                                 <v-col cols="1">
                                   <!-- Select/Unselect course (will add and drop to schedule) -->
                                   <b-form-checkbox-group
@@ -75,10 +91,7 @@
                                     @change="onCheckbox"
                                   ></b-form-checkbox-group>
                                 </v-col>
-                              </v-row>
-                              <!-- Color coded boxes -->
-                              <v-row justify="space-around">
-                                <v-col>
+                                <v-col cols="4" style="padding-top: 18px">
                                   <v-icon
                                     v-if="x.days.sunday"
                                     small
@@ -122,26 +135,13 @@
                                   >fas fa-square</v-icon>
                                   <v-icon v-if="!x.days.saturday" small>far fa-square</v-icon>
                                 </v-col>
-                                <v-col>
-                                  <div v-if="!x.times.tba">
+                                <v-col style="padding-top: 18px">
+                                  <div v-if="!x.times.tba" style="text-align: left">
                                     {{x.schedule_type}}:
                                     {{x.times.start.substring(11,16)}}
                                     - {{x.times.end.substring(11,16)}}
                                   </div>
                                   <div v-if="x.times.tba">{{x.schedule_type}}: TBA</div>
-                                </v-col>
-                                <v-col cols="1">
-                                  <v-icon
-                                    :color="x.campus_color"
-                                    :id="x.crn + 'tooltip'"
-                                  >fas fa-school</v-icon>
-                                  <b-tooltip
-                                    placement="bottom"
-                                    :target="x.crn + 'tooltip'"
-                                    triggers="hover"
-                                  >
-                                    <span>{{x.campus}}: {{x.location}}</span>
-                                  </b-tooltip>
                                 </v-col>
                               </v-row>
                             </v-container>
