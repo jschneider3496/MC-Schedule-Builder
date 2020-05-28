@@ -2,11 +2,16 @@
   <div style="max-height: 100%">
     <b-navbar toggleable="lg" type="dark" variant="info">
       <b-navbar-brand href="/">MC-Scheduler: {{name}}</b-navbar-brand>
+      <v-spacer></v-spacer>
+      <v-btn @click="onCreateSchedule()">Create New Schedule</v-btn>
+      <v-select
+        style="background-color: white; width: 20%"
+        label="name"
+        :options="schedules"
+        @input="getScheduleBuilder"
+        placeholder="Select an existing schedule"
+      ></v-select>
     </b-navbar>
-    <!-- Header -->
-    <!-- <b-navbar toggleable="lg" type="dark" variant="info">
-      <b-navbar-brand href="/">MC Scheduler: {{name}}</b-navbar-brand>
-    </b-navbar>-->
     <v-container>
       <v-row>
         <!-- LHS of screen (calendar) -->
@@ -30,13 +35,14 @@
         <!-- RHS of screen -->
         <v-col cols="4" style="overflow: scroll; max-height: 750px">
           <!-- Select Subject -->
-          <v-select :options="subjects" @input="getClassTitles" />
+          <v-select :options="subjects" @input="getClassTitles" placeholder="Select a subject" />
           <!-- Select course title -->
           <v-select
             v-if="class_titles.length"
             :options="class_titles"
             @input="getClassSections"
             label="title"
+            placeholder="Select a course"
           />
 
           <!-- Select section -->
@@ -69,7 +75,6 @@
                                   :id="x.crn + 'tooltip'"
                                 >fas fa-school</v-icon>
                                 <b-tooltip
-                                  placement="bottom"
                                   :target="x.crn + 'tooltip'"
                                   triggers="hover"
                                 >
@@ -206,6 +211,7 @@ export default {
       today: '1899-12-31',
       events: [],
       hover_bool: false,
+      schedules: [],
     };
   },
   methods: {
@@ -351,6 +357,39 @@ export default {
         this.hover_bool = false;
       }
     },
+    getSchedules() {
+      const path = 'http://localhost:5000/schedules';
+      axios
+        .get(path)
+        .then((res) => {
+          this.schedules = res.data.schedules;
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+        });
+    },
+    getScheduleBuilder(schedule) {
+      this.schedule_id = schedule.id;
+      this.$router.push({ path: `/builder/${this.schedule_id}` });
+      this.getSchedule();
+    },
+    onCreateSchedule() {
+      this.createSchedule();
+    },
+    createSchedule() {
+      const path = 'http://localhost:5000/create';
+      axios
+        .get(path)
+        .then((res) => {
+          this.getSchedules();
+          this.getScheduleBuilder(res.data.schedule_file);
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+        });
+    },
   },
   mounted() {
     this.$refs.calendar.scrollToTime('8:00');
@@ -358,6 +397,7 @@ export default {
   created() {
     this.schedule_id = this.$route.params.id;
     this.getSchedule();
+    this.getSchedules();
   },
 };
 </script>
