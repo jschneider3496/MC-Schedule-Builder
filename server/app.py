@@ -51,62 +51,10 @@ def ping_pong():
 def return_schedules():
     return jsonify({"schedules": get_schedules()})
 
-# @app.route('/builder', methods=['GET', 'POST'])
-# def builder_menu():
-#     if request.method == 'POST':
-#         # Post Dropdown #1: retrieve all unique titles related to subject
-#         # No json updates, simply temporary updates
-#         if request.get_json().get("goal") == "getTitles":
-#             # Load all classes related to subject
-#             subject = request.get_json().get("subject")
-#             with open('../data/course_data/' + subject + '.json') as infile:
-#                 class_offerings = json.load(infile)
-
-#             # Add unique class titles to class_titles
-#             class_titles = []
-#             for c in class_offerings:
-#                 if c["title"] not in class_titles:
-#                     class_titles.append(c["title"])
-#             return jsonify({
-#                 'class_titles': class_titles,
-#                 'subject': subject,
-#                 })
-
-#         # Post Dropdown #2: Retrieve all sections/classes that match the title
-#         # Update schedule file to include selected class title + sections
-#         # Add
-#         elif request.get_json().get("goal") == "getSections":
-#             # Retrieve class title & subject
-#             class_title = request.get_json().get("classTitle")
-#             subject = request.get_json().get("subject")
-#             with open('../data/course_data/' + subject + '.json') as infile:
-#                 class_offerings = json.load(infile)
-            
-#             # Subset of all classes - contains all sections that match title 
-#             # ie: for ELEM FRENCH I - FREN 101 -> course numbers 10372 & 16432
-#             sections = []
-#             for s in class_offerings:
-#                 if s["title"] == class_title:
-#                     sections.append(s)
-#             SCHEDULE_FILE["selected_titles"][class_title] = sections
-#             write_json(SCHEDULE_FILE, 'e298ede66f1e47e8bc5421fdf41dfbbd')
-#             return jsonify({
-#                 'subject': subject,
-#                 'sections': sections
-#                 })
-
-#     else: 
-#         return jsonify({
-#             'schedule': SCHEDULE_FILE["schedule"],
-#             'name': SCHEDULE_FILE["name"],
-#             'id': SCHEDULE_FILE["id"],
-#             'subjects': subjects,
-#             'selected_titles': SCHEDULE_FILE["selected_titles"]
-#         })
 @app.route('/create', methods=['GET'])
 def create_schedule():
     id = uuid.uuid4().hex
-    name = str(r.get_random_word() + " " + r.get_random_word())
+    name = (str(r.get_random_word() + " " + r.get_random_word())).upper()
     temp = {
         'id': id,
         'name': name,
@@ -115,7 +63,6 @@ def create_schedule():
         'subjects': []
     }
     write_json(temp, id)
-    
     return jsonify({"schedule_file": get_schedule_file(id)})
 
 @app.route('/builder/<schedule_id>', methods=['GET','POST','PUT'])
@@ -128,7 +75,7 @@ def builder_menu(schedule_id):
             SCHEDULE_FILE["schedule"] = payload
             write_json(SCHEDULE_FILE, schedule_id)
         if goal == 'removeSelectedTitle':
-            remove_sections(payload)
+            SCHEDULE_FILE = remove_sections(payload, SCHEDULE_FILE)
             SCHEDULE_FILE["selected_titles"].pop(payload)
             write_json(SCHEDULE_FILE, schedule_id)
         return jsonify({"status": "success"})
@@ -183,10 +130,11 @@ def builder_menu(schedule_id):
             'selected_titles': SCHEDULE_FILE["selected_titles"]
         })
 
-def remove_sections(title):
+def remove_sections(title, SCHEDULE_FILE):
     for s in SCHEDULE_FILE["schedule"]:
         if title == s['title']:
             SCHEDULE_FILE["schedule"].remove(s)
+    return SCHEDULE_FILE
 
 # Update schedule file with new data
 def write_json(data, file_id):

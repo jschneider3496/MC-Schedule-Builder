@@ -1,29 +1,10 @@
 <template>
   <v-app>
-    <!-- need to fix padding -->
-    <!-- <v-app-bar app >
-      <v-toolbar app style="background-color: #2874a6; width: 100%; padding: 0px">
-        <v-toolbar-title style="color: white; padding: 0px">MC-Scheduler</v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-toolbar-items class="hidden-xs-only">
-          <v-select style="background-color: white" label="id" :options="schedules"></v-select>
-          <v-btn style="background-color: #2874a6" flat v-for="item in menuItems" :key="item.title" :to="item.path">
-            <v-icon left dark>{{ item.icon }}</v-icon>
-            {{ item.title }}
-          </v-btn>
-
-        </v-toolbar-items>
-      </v-toolbar>
-    </v-app-bar> -->
-
     <!-- Sizes your content based upon application components -->
     <v-content style="padding: 0px">
       <router-view></router-view>
     </v-content>
   </v-app>
-  <!-- <div id="app">
-    <router-view/>
-  </div>-->
 </template>
 
 <script>

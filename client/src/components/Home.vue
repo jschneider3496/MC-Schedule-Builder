@@ -1,8 +1,10 @@
-<template >
+<template>
   <div>
     <b-navbar toggleable="lg" type="dark" variant="info">
       <b-navbar-brand href="/">MC-Scheduler</b-navbar-brand>
     </b-navbar>
+    <br />
+    <br />
     <v-container fluid style="min-height: 100%; height: 100%">
       <v-row>
         <v-col cols="7">
@@ -13,27 +15,26 @@
               :interval="4000"
               controls
               indicators
-              background="#ababab"
+              background="white"
               img-width="1024"
               img-height="480"
               style="text-shadow: 1px 1px 2px #333;"
               @sliding-start="onSlideStart"
               @sliding-end="onSlideEnd"
             >
+              <!-- Slides with image only -->
+              <b-carousel-slide img-src="https://i.gyazo.com/a7c8c8565f2f610e7c4fdd580ddb1f58.png"></b-carousel-slide>
+
               <!-- Text slides with image -->
               <b-carousel-slide
-                caption="First slide"
-                text="Nulla vitae elit libero, a pharetra augue mollis interdum."
-                img-src="https://picsum.photos/1024/480/?image=52"
+                caption="Suggestive Highlighting"
+                img-src="https://i.gyazo.com/c427ca53d0fbb9549a54bda0e0a5d704.png"
               ></b-carousel-slide>
 
               <!-- Slides with custom text -->
               <b-carousel-slide img-src="https://picsum.photos/1024/480/?image=54">
                 <h1>Hello world!</h1>
               </b-carousel-slide>
-
-              <!-- Slides with image only -->
-              <b-carousel-slide img-src="https://i.gyazo.com/a7c8c8565f2f610e7c4fdd580ddb1f58.png"></b-carousel-slide>
             </b-carousel>
           </div>
         </v-col>
@@ -52,15 +53,22 @@
               It uses utility classes for typography and spacing to space content out within the larger
               container.
             </p>
-
-            <v-btn large @click="onCreateSchedule()">Create New Schedule</v-btn>
-            <p>Select from existing schedules:</p>
-            <v-select
-              style="background-color: white"
-              label="name"
-              :options="schedules"
-              @input="getScheduleBuilder"
-            ></v-select>
+            <v-container fluid>
+              <v-row>
+                <v-col>
+                  <v-btn @click="onCreateSchedule()">Create New Schedule</v-btn>
+                </v-col>
+                <v-col>
+                  <v-select
+                    style="background-color: white"
+                    label="name"
+                    :options="schedules"
+                    @input="getScheduleBuilder"
+                    placeholder="Select an existing schedule"
+                  ></v-select>
+                </v-col>
+              </v-row>
+            </v-container>
           </b-jumbotron>
         </v-col>
       </v-row>
@@ -146,17 +154,6 @@ export default {
     getScheduleBuilder(schedule) {
       const { id } = schedule;
       this.$router.push({ path: `/builder/${id}` });
-      // const path = 'http://localhost:5000/builder';
-      // axios
-      //   .get(path)
-      //   .then((res) => {
-      //     this.schedules = res.data.schedules;
-      //   })
-      //   .catch((error) => {
-      //     // eslint-disable-next-line
-      //     console.error(error);
-      //     this.getSchedules();
-      //   });
     },
   },
   created() {
