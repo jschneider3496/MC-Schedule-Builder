@@ -20,9 +20,10 @@ MC Scheduler is a schedule planning tool for Montgomery College students.
 ### Server
 - Python
 - [Flask](https://pypi.org/project/Flask/)
+- [Flask Cors](https://flask-cors.readthedocs.io/en/latest/)
 - [Random Word](https://pypi.org/project/Random-Word/)
 ## How to Run
-Assuming Dependencies are met:
+Assuming dependencies are met:
 - MC-Schedule-Builder/client
   1. npm install
   2. npm run serve
