@@ -1,7 +1,9 @@
 <template>
   <div style="max-height: 100%">
     <b-navbar toggleable="lg" type="dark" variant="info">
-      <b-navbar-brand href="/">MC-Scheduler: {{name}}</b-navbar-brand>
+      <b-navbar-brand href="/">MC Scheduler</b-navbar-brand>
+      <v-spacer></v-spacer>
+      <span style="color: white; align: center">{{name}}</span>
       <v-spacer></v-spacer>
       <v-btn @click="onCreateSchedule()">Create New Schedule</v-btn>
       <v-select
