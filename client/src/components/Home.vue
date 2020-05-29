@@ -1,7 +1,8 @@
 <template>
   <div>
+    <!-- Header -->
     <b-navbar toggleable="lg" type="dark" variant="info">
-      <b-navbar-brand href="/">MC-Scheduler</b-navbar-brand>
+      <b-navbar-brand href="/">MC Scheduler</b-navbar-brand>
     </b-navbar>
     <br />
     <br />
@@ -27,14 +28,9 @@
 
               <!-- Text slides with image -->
               <b-carousel-slide
-                caption="Suggestive Highlighting"
                 img-src="https://i.gyazo.com/c427ca53d0fbb9549a54bda0e0a5d704.png"
-              ></b-carousel-slide>
+              ><h1 stlye="color: black">Suggestive Highlighting</h1></b-carousel-slide>
 
-              <!-- Slides with custom text -->
-              <b-carousel-slide img-src="https://picsum.photos/1024/480/?image=54">
-                <h1>Hello world!</h1>
-              </b-carousel-slide>
             </b-carousel>
           </div>
         </v-col>
@@ -43,15 +39,13 @@
             <template v-slot:header>MC Scheduler</template>
 
             <template v-slot:lead>
-              This is a simple hero unit, a simple jumbotron-style component for calling extra attention to
-              featured content or information.
+              Plan your semester schedule easily with MC Scheduler.
             </template>
 
             <hr class="my-4" />
 
             <p>
-              It uses utility classes for typography and spacing to space content out within the larger
-              container.
+              Create a new schedule or choose an existing schedule to start!
             </p>
             <v-container fluid>
               <v-row>
