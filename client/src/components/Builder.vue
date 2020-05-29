@@ -29,7 +29,35 @@
               color="primary"
               type="week"
               :event-color="getEventColor"
+              @click:event="showEvent"
             ></v-calendar>
+            <!-- Event information panel (onclick) -->
+            <v-menu
+              v-model="selectedOpen"
+              :close-on-content-click="false"
+              :activator="selectedElement"
+              offset-x
+            >
+              <v-card color="grey lighten-4" min-width="350px" flat>
+                <v-toolbar :color="selectedEvent.color" dark>
+                  <v-toolbar-title>{{selectedEvent.title}}</v-toolbar-title>
+                  <v-spacer></v-spacer>
+                  <v-btn icon @click="onDeleteClassButton(selectedEvent.crn)">
+                    <v-icon>far fa-trash-alt</v-icon>
+                  </v-btn>
+                </v-toolbar>
+                <v-card-text>
+                  <p>{{selectedEvent.name}} ({{selectedEvent.crn}})</p>
+                  <p>Instructor(s): {{selectedEvent.instructor}}</p>
+                  <p>Seats Left: {{selectedEvent.seats}}</p>
+                  <p>{{selectedEvent.campus}}: {{selectedEvent.location}}</p>
+                  <p>Credits: {{selectedEvent.credits}}</p>
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn text color="secondary" @click="selectedOpen = false">Cancel</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-menu>
           </v-sheet>
           <p style="text-align: right">Credits: {{parseFloat(credits)}}</p>
         </v-col>
@@ -54,7 +82,7 @@
               <v-expansion-panel-header outline :color="sections[0].class_color">
                 {{title}}
                 <template v-slot:actions>
-                  <v-icon color="white">mdi-check</v-icon>
+                  <v-icon color="white">fas fa-caret-down</v-icon>
                 </template>
               </v-expansion-panel-header>
               <v-expansion-panel-content :id="title" v-for="(x, index) in sections" :key="index">
@@ -76,10 +104,7 @@
                                   :color="x.campus_color"
                                   :id="x.crn + 'tooltip'"
                                 >fas fa-school</v-icon>
-                                <b-tooltip
-                                  :target="x.crn + 'tooltip'"
-                                  triggers="hover"
-                                >
+                                <b-tooltip :target="x.crn + 'tooltip'" triggers="hover">
                                   <span>{{x.campus}}: {{x.location}}</span>
                                 </b-tooltip>
                               </v-col>
@@ -214,6 +239,9 @@ export default {
       events: [],
       hover_bool: false,
       schedules: [],
+      selectedEvent: {},
+      selectedElement: null,
+      selectedOpen: false,
     };
   },
   methods: {
@@ -240,6 +268,12 @@ export default {
                   end: e.end,
                   color: element.class_color,
                   crn: element.crn,
+                  title: element.title,
+                  instructor: element.instructor,
+                  seats: element.seats,
+                  campus: element.campus,
+                  location: element.location,
+                  credits: element.credits,
                 });
               });
             });
@@ -308,7 +342,7 @@ export default {
           this.getSchedule();
         });
     },
-    // When delete button is clicked
+    // When delete button under dropdown is clicked
     onDeleteSelectedTitle(selectedTitle) {
       this.removeSelectedTitle(selectedTitle);
     },
@@ -391,6 +425,34 @@ export default {
           // eslint-disable-next-line
           console.error(error);
         });
+    },
+    showEvent({ nativeEvent, event }) {
+      const open = () => {
+        this.selectedEvent = event;
+        this.selectedElement = nativeEvent.target;
+        setTimeout(() => (this.selectedOpen = true), 10);
+      };
+
+      if (this.selectedOpen) {
+        this.selectedOpen = false;
+        setTimeout(open, 10);
+      } else {
+        open();
+      }
+
+      nativeEvent.stopPropagation();
+    },
+    onDeleteClassButton(crn) {
+      this.selectedOpen = false;
+      let course = [];
+      this.schedule.forEach((element) => {
+        if (element.crn === crn) course = element;
+      });
+      const index = this.schedule.indexOf(course);
+      if (index > -1) {
+        this.schedule.splice(index, 1);
+      }
+      this.updateSchedule(this.schedule);
     },
   },
   mounted() {

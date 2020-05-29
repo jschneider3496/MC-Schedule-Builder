@@ -24,13 +24,17 @@
               @sliding-end="onSlideEnd"
             >
               <!-- Slides with image only -->
-              <b-carousel-slide img-src="https://i.gyazo.com/a7c8c8565f2f610e7c4fdd580ddb1f58.png"></b-carousel-slide>
+              <b-carousel-slide img-src="https://i.gyazo.com/64be73bf32eeb279a6d91fcec3173ba8.png"></b-carousel-slide>
 
               <!-- Text slides with image -->
-              <b-carousel-slide
-                img-src="https://i.gyazo.com/c427ca53d0fbb9549a54bda0e0a5d704.png"
-              ><h1 stlye="color: black">Suggestive Highlighting</h1></b-carousel-slide>
+              <b-carousel-slide img-src="https://i.gyazo.com/9ff690bf4304efe8f9d02b02ae75b45f.png">
+                <h1 stlye="color: black">Suggestive Highlighting</h1>
+              </b-carousel-slide>
 
+              <!-- Text slides with image -->
+              <b-carousel-slide img-src="https://i.gyazo.com/2161686536b7120084341fa22d8cea74.png">
+                <h1 stlye="color: black">Course Information</h1>
+              </b-carousel-slide>
             </b-carousel>
           </div>
         </v-col>
@@ -38,15 +42,13 @@
           <b-jumbotron>
             <template v-slot:header>MC Scheduler</template>
 
-            <template v-slot:lead>
-              Plan your semester schedule easily with MC Scheduler.
-            </template>
+            <template
+              v-slot:lead
+            >Plan your semester schedule easily with MC Scheduler (inspired by Courseoff)!</template>
 
             <hr class="my-4" />
 
-            <p>
-              Create a new schedule or choose an existing schedule to start!
-            </p>
+            <p>Create a new schedule or choose an existing schedule to start!</p>
             <v-container fluid>
               <v-row>
                 <v-col>
@@ -71,7 +73,7 @@
     <v-footer dark padless absolute>
       <v-card class="flex" flat tile>
         <v-card-title class="teal">
-          <strong class="subheading">Get connected with us on social networks!</strong>
+          <strong class="subheading">See the code and get connected with us!</strong>
 
           <v-spacer></v-spacer>
 
